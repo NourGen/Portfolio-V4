@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BSA Portfolio Compiler</title>
+  <link rel="shortcut icon" href="Matrials/BSA-icon.jpg" type="image/x-icon"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --color-bg: #130a05;
+      --color-surface: #1e1108;
+      --color-card: #27160b;
+      --color-primary: #c4783a;
+      --color-secondary: #d4914e;
+      --color-accent: #e8b88a;
+      --color-text: #faf7f2;
+      --color-text-muted: #9c7b65;
+      --color-border: rgba(196,120,58,0.2);
+      --color-border-strong: rgba(212,145,78,0.4);
+      --font-body: "Inter", sans-serif;
+      --font-display: "Sora", sans-serif;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 99px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      background-color:var(--color-bg);
+      color:var(--color-text);
+      font-family:var(--font-body);
+      line-height:1.6;
+      min-height:100vh;
+      background-image:
+        radial-gradient(ellipse 600px 400px at 15% 20%, rgba(196,120,58,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 500px 350px at 85% 80%, rgba(212,145,78,0.08) 0%, transparent 60%);
+      padding-bottom:120px;
+    }
+    .container{max-width:900px;margin:0 auto;padding:40px 20px;}
+    header{text-align:center;margin-bottom:40px;}
+    .logo-icon{height:64px;width:auto;margin-bottom:15px;filter:drop-shadow(0 0 12px rgba(196,120,58,0.4));}
+    h1{
+      font-family:var(--font-display);font-size:2.2rem;font-weight:700;
+      background:linear-gradient(135deg,var(--color-primary) 0%,var(--color-accent) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      margin-bottom:10px;
+    }
+    .subtitle{color:var(--color-text-muted);font-size:1rem;}
+    .card{
+      background:var(--color-surface);border:1px solid var(--color-border);
+      border-radius:var(--radius-lg);padding:30px;margin-bottom:25px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    }
+    .card-title{
+      font-family:var(--font-display);font-size:1.25rem;margin-bottom:20px;
+      color:var(--color-accent);display:flex;align-items:center;gap:10px;
+    }
+    .connection-wrap{display:flex;flex-direction:column;gap:15px;}
+    .btn{
+      background:linear-gradient(135deg,var(--color-primary) 0%,var(--color-secondary) 100%);
+      color:#130a05;border:none;padding:12px 24px;border-radius:var(--radius-pill);
+      font-family:var(--font-display);font-weight:700;font-size:0.95rem;cursor:pointer;
+      transition:transform 0.2s ease,box-shadow 0.2s ease;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;width:fit-content;
+    }
+    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(196,120,58,0.3);}
+    .btn:disabled{background:#332216;color:#665548;cursor:not-allowed;transform:none;box-shadow:none;}
+    .btn-outline{
+      background:rgba(196,120,58,0.1);border:1px solid var(--color-border);
+      color:var(--color-accent);
+    }
+    .btn-outline:hover{background:rgba(196,120,58,0.2);border-color:var(--color-border-strong);}
+    .btn-danger{
+      background:rgba(230,75,75,0.12);border:1px solid rgba(230,75,75,0.25);color:#ff8888;
+    }
+    .btn-danger:hover{background:rgba(230,75,75,0.22);border-color:rgba(230,75,75,0.45);}
+    .btn-sm{padding:6px 14px;font-size:0.8rem;}
+    .btn-xs{padding:4px 10px;font-size:0.75rem;}
+
+    .status-badge{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 16px;
+      border-radius:var(--radius-pill);font-size:0.85rem;font-weight:600;
+      background:rgba(230,75,75,0.1);border:1px solid rgba(230,75,75,0.2);color:#ff8888;
+      width:fit-content;
+    }
+    .status-badge.connected{background:rgba(75,230,130,0.1);border:1px solid rgba(75,230,130,0.2);color:#88ffaa;}
+    .status-badge.fallback{background:rgba(212,145,78,0.1);border:1px solid rgba(212,145,78,0.2);color:#ffbb66;}
+
+    .form-group{margin-bottom:20px;}
+    label{
+      display:block;font-size:0.83rem;text-transform:uppercase;
+      letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:8px;font-weight:600;
+    }
+    input[type="text"],textarea{
+      width:100%;background:var(--color-card);border:1px solid var(--color-border);
+      border-radius:var(--radius-md);padding:12px 16px;color:var(--color-text);
+      font-family:var(--font-body);font-size:0.95rem;
+      transition:border-color 0.25s ease,box-shadow 0.25s ease;
+    }
+    input[type="text"]:focus,textarea:focus{
+      outline:none;border-color:var(--color-border-strong);
+      box-shadow:0 0 10px rgba(196,120,58,0.15);
+    }
+    textarea{resize:vertical;min-height:80px;}
+
+    /* ── Upload widget ── */
+    .upload-widget{
+      display:flex;align-items:center;gap:20px;
+      background:var(--color-card);padding:15px;
+      border-radius:var(--radius-md);border:1px dashed var(--color-border);
+    }
+    .upload-preview{
+      width:64px;height:64px;border-radius:50%;
+      background:rgba(196,120,58,0.08);border:1px solid var(--color-border);object-fit:cover;
+    }
+    .upload-controls{display:flex;flex-direction:column;gap:5px;}
+    .file-input-wrapper{position:relative;overflow:hidden;display:inline-block;}
+    .file-input-wrapper input[type="file"]{
+      position:absolute;left:0;top:0;opacity:0;cursor:pointer;width:100%;height:100%;
+    }
+    .file-info{font-size:0.8rem;color:var(--color-text-muted);}
+
+    /* ── Social Platforms ── */
+    .platforms-toolbar{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:20px;flex-wrap:wrap;gap:12px;
+    }
+    .add-platform-row{
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    }
+    .platform-select{
+      background:var(--color-card);border:1px solid var(--color-border);
+      border-radius:var(--radius-md);padding:8px 14px;color:var(--color-text);
+      font-family:var(--font-body);font-size:0.9rem;cursor:pointer;
+      transition:border-color 0.2s;
+    }
+    .platform-select:focus{outline:none;border-color:var(--color-border-strong);}
+
+    #platforms-list{display:flex;flex-direction:column;gap:14px;}
+
+    .platform-row{
+      display:grid;grid-template-columns:36px 130px 1fr auto;
+      align-items:center;gap:12px;
+      background:var(--color-card);border:1px solid var(--color-border);
+      border-radius:var(--radius-md);padding:12px 16px;
+      transition:border-color 0.2s;
+      animation:slide-in 0.25s ease;
+    }
+    .platform-row:hover{border-color:var(--color-border-strong);}
+    @keyframes slide-in{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+    .platform-icon{
+      font-size:1.3rem;text-align:center;
+      filter:drop-shadow(0 0 4px rgba(196,120,58,0.3));
+    }
+    .platform-name{
+      font-family:var(--font-display);font-size:0.82rem;font-weight:700;
+      color:var(--color-accent);letter-spacing:0.04em;
+    }
+    .platform-input{
+      background:transparent;border:none;border-bottom:1px solid var(--color-border);
+      border-radius:0;padding:6px 4px;color:var(--color-text);
+      font-family:var(--font-body);font-size:0.9rem;width:100%;
+      transition:border-color 0.2s;
+    }
+    .platform-input:focus{outline:none;border-bottom-color:var(--color-primary);}
+    .platform-input::placeholder{color:rgba(156,123,101,0.45);font-size:0.85rem;}
+
+    .platform-remove{
+      background:none;border:none;cursor:pointer;
+      color:rgba(255,136,136,0.45);font-size:1.1rem;
+      transition:color 0.2s,transform 0.2s;padding:4px;border-radius:6px;
+    }
+    .platform-remove:hover{color:#ff8888;transform:scale(1.15);}
+
+    @media(max-width:580px){
+      .platform-row{grid-template-columns:32px 100px 1fr auto;gap:8px;padding:10px 12px;}
+    }
+
+    /* ── Projects ── */
+    .projects-container{display:flex;flex-direction:column;gap:20px;}
+    .project-item{
+      background:var(--color-card);border:1px solid var(--color-border);
+      border-radius:var(--radius-md);padding:20px;
+      transition:border-color 0.3s;
+    }
+    .project-item:hover{border-color:var(--color-border-strong);}
+    .project-header{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-bottom:15px;border-bottom:1px solid rgba(196,120,58,0.1);padding-bottom:10px;
+    }
+    .project-num{font-family:var(--font-display);font-weight:700;color:var(--color-accent);font-size:0.95rem;}
+    .project-fields{display:flex;flex-direction:column;gap:15px;}
+
+    /* ── Compile bar ── */
+    .compile-bar{
+      display:flex;align-items:center;justify-content:space-between;
+      background:var(--color-surface);border:1px solid var(--color-border-strong);
+      border-radius:var(--radius-lg);padding:20px 30px;
+      box-shadow:0 12px 40px rgba(196,120,58,0.12);
+      position:sticky;bottom:20px;z-index:10;backdrop-filter:blur(10px);
+    }
+
+    /* ── Notification ── */
+    .notification{
+      position:fixed;bottom:100px;left:50%;
+      transform:translateX(-50%) translateY(40px);
+      background:#1e3c23;border:1px solid #33663a;color:#88ffaa;
+      padding:12px 24px;border-radius:var(--radius-pill);
+      font-weight:600;font-size:0.95rem;box-shadow:0 10px 30px rgba(0,0,0,0.5);
+      opacity:0;visibility:hidden;
+      transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.3s,visibility 0.3s;
+      z-index:999;
+    }
+    .notification.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+    .notification.error{background:#3c1e1e;border-color:#663333;color:#ff8888;}
+
+    /* ── Form blocker ── */
+    .form-blocker{position:relative;}
+    .form-blocker.blocked::after{
+      content:"Please select your portfolio folder above to load and edit content.";
+      position:absolute;inset:0;background:rgba(30,17,8,0.85);backdrop-filter:blur(4px);
+      display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;
+      font-family:var(--font-display);font-weight:700;color:var(--color-text-muted);
+      font-size:1.1rem;border-radius:var(--radius-lg);z-index:5;
+    }
+    .instructions-box{
+      margin-top:15px;padding:12px 16px;
+      background:rgba(196,120,58,0.05);border-radius:var(--radius-md);
+      border:1px solid var(--color-border);font-size:0.82rem;color:var(--color-text-muted);
+    }
+    .instructions-box ul{margin-left:20px;margin-top:5px;display:flex;flex-direction:column;gap:3px;}
+
+    .empty-platforms{
+      text-align:center;padding:24px;color:var(--color-text-muted);
+      font-size:0.9rem;border:1px dashed var(--color-border);
+      border-radius:var(--radius-md);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="Matrials/BSA-icon-with-out-bg.png" alt="BSA" class="logo-icon"/>
+    <h1>BSA Portfolio Compiler</h1>
+    <p class="subtitle">Customize, compile, and build graduate portfolios instantly</p>
+  </header>
+
+  <!-- 1. Workspace -->
+  <section class="card">
+    <h2 class="card-title"><span>📁</span> Workspace Folder Connection</h2>
+    <div class="connection-wrap">
+      <p class="file-info" style="font-size:0.9rem;">
+        Grant directory write permissions to automate file deployment. If your protocol is file://, the system will automatically use the download-compilation fallback.
+      </p>
+      <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+        <button id="btn-connect" class="btn">Connect Folder Directory</button>
+        <span id="connection-status" class="status-badge">No Directory Connected</span>
+      </div>
+      <div id="dir-path-info" class="file-info" style="display:none;font-weight:600;color:var(--color-accent);"></div>
+    </div>
+  </section>
+
+  <!-- Form Blocker -->
+  <div id="form-container" class="form-blocker blocked">
+
+    <!-- 2. Personal Info -->
+    <section class="card">
+      <h2 class="card-title"><span>👤</span> Personal Identity</h2>
+      <div class="form-group">
+        <label for="input-name">Graduate Full Name</label>
+        <input type="text" id="input-name" placeholder="E.g., Nour El-Din"/>
+      </div>
+      <div class="form-group">
+        <label>Profile Picture (Avatar)</label>
+        <div class="upload-widget">
+          <img id="img-avatar-preview" src="Matrials/Man_empty_avatar_Vector_photo_placeholder_for….jpg" alt="Avatar" class="upload-preview"/>
+          <div class="upload-controls">
+            <div class="file-input-wrapper">
+              <button type="button" class="btn btn-outline btn-sm">Choose Image</button>
+              <input type="file" id="input-avatar" accept="image/*"/>
+            </div>
+            <span id="txt-avatar-file" class="file-info">No file selected (using current)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Social Platforms — dynamic -->
+    <section class="card">
+      <h2 class="card-title"><span>🔗</span> Social & Contact Channels</h2>
+
+      <div class="platforms-toolbar">
+        <p class="file-info">Add, edit, or remove platforms. Only active ones will appear in the portfolio.</p>
+        <div class="add-platform-row">
+          <select id="platform-picker" class="platform-select">
+            <option value="">— Add platform —</option>
+            <option value="website">🌐  Website</option>
+            <option value="github">🐙  GitHub</option>
+            <option value="linkedin">💼  LinkedIn</option>
+            <option value="facebook">📘  Facebook</option>
+            <option value="instagram">📸  Instagram</option>
+            <option value="tiktok">🎵  TikTok</option>
+            <option value="snapchat">👻  Snapchat</option>
+            <option value="twitter">🐦  Twitter / X</option>
+            <option value="youtube">▶️  YouTube</option>
+            <option value="behance">🎨  Behance</option>
+            <option value="gmail">✉️  Gmail</option>
+            <option value="phone">📞  Phone</option>
+            <option value="whatsapp">💬  WhatsApp</option>
+            <option value="telegram">✈️  Telegram</option>
+          </select>
+          <button id="btn-add-platform" class="btn btn-outline btn-sm">+ Add</button>
+        </div>
+      </div>
+
+      <div id="platforms-list">
+        <div class="empty-platforms" id="empty-msg">No platforms added yet. Use the dropdown above to add one.</div>
+      </div>
+    </section>
+
+    <!-- 4. Projects -->
+    <section class="card">
+      <h2 class="card-title" style="justify-content:space-between;margin-bottom:25px;">
+        <span>💼 Projects Portfolio</span>
+        <button id="btn-add-project" class="btn btn-outline btn-sm">+ Add Project</button>
+      </h2>
+      <div id="projects-list" class="projects-container"></div>
+    </section>
+
+    <!-- 5. Compile Bar -->
+    <div class="compile-bar">
+      <div>
+        <h3 style="font-size:1.05rem;font-family:var(--font-display);color:var(--color-accent);">Compile Dashboard</h3>
+        <p id="txt-compile-info" class="file-info" style="font-size:0.8rem;">Ready to compile files directly to disk.</p>
+      </div>
+      <button id="btn-compile" class="btn" style="padding:14px 30px;">Compile & Save Portfolio</button>
+    </div>
+  </div>
+
+  <!-- Fallback Instructions -->
+  <div id="fallback-instructions" class="card" style="display:none;border-color:var(--color-secondary);">
+    <h3 class="card-title" style="color:var(--color-secondary);">📥 Manual Fallback Instructions</h3>
+    <p class="file-info" style="font-size:0.9rem;color:var(--color-text);">
+      Since direct local disk saving is restricted to secure server contexts, the compiler generated downloads instead. Complete compilation in 2 simple steps:
+    </p>
+    <div class="instructions-box">
+      <strong>Steps:</strong>
+      <ul>
+        <li>1. Drag the downloaded <code>index.html</code> into the main portfolio folder to replace the old one.</li>
+        <li>2. Drag any downloaded image or PDF files into the <code>Matrials/</code> folder.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div id="notification-toast" class="notification">Compilation successful!</div>
+
+<script>
+/* ══════════════════════════════════════════
+   PLATFORM DEFINITIONS
+══════════════════════════════════════════ */
+const PLATFORM_META = {
+  website:   { icon:"🌐", label:"Website",    placeholder:"https://yourwebsite.com",         prefix:["https://","http://"],   hrefFn: v=>v,                        labelFn: v=>stripUrl(v,"https://","http://")       },
+  github:    { icon:"🐙", label:"GitHub",     placeholder:"https://github.com/username",      prefix:["https://github.com/"],  hrefFn: v=>v,                        labelFn: v=>stripUrl(v,"https://github.com/")      },
+  linkedin:  { icon:"💼", label:"LinkedIn",   placeholder:"https://linkedin.com/in/username", prefix:["https://linkedin.com/in/","https://www.linkedin.com/in/"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://linkedin.com/in/","https://www.linkedin.com/in/") },
+  facebook:  { icon:"📘", label:"Facebook",   placeholder:"https://facebook.com/username",    prefix:["https://facebook.com/","https://www.facebook.com/"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://facebook.com/","https://www.facebook.com/") },
+  instagram: { icon:"📸", label:"Instagram",  placeholder:"https://instagram.com/username",   prefix:["https://instagram.com/","https://www.instagram.com/"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://instagram.com/","https://www.instagram.com/") },
+  tiktok:    { icon:"🎵", label:"TikTok",     placeholder:"https://tiktok.com/@username",     prefix:["https://tiktok.com/@","https://www.tiktok.com/@"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://tiktok.com/@","https://www.tiktok.com/@") },
+  snapchat:  { icon:"👻", label:"Snapchat",   placeholder:"https://snapchat.com/add/username",prefix:["https://snapchat.com/add/","https://www.snapchat.com/add/"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://snapchat.com/add/","https://www.snapchat.com/add/") },
+  twitter:   { icon:"🐦", label:"Twitter / X",placeholder:"https://x.com/username",          prefix:["https://x.com/","https://twitter.com/"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://x.com/","https://twitter.com/") },
+  youtube:   { icon:"▶️", label:"YouTube",    placeholder:"https://youtube.com/@channel",     prefix:["https://youtube.com/@","https://www.youtube.com/@"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://youtube.com/@","https://www.youtube.com/@") },
+  behance:   { icon:"🎨", label:"Behance",    placeholder:"https://behance.net/username",     prefix:["https://behance.net/","https://www.behance.net/"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://behance.net/","https://www.behance.net/") },
+  gmail:     { icon:"✉️", label:"Gmail",      placeholder:"yourname@gmail.com",               prefix:["mailto:"], hrefFn: v=>"mailto:"+v,             labelFn: v=>v },
+  phone:     { icon:"📞", label:"Phone",      placeholder:"+20 100 000 0000",                 prefix:["tel:"],    hrefFn: v=>"tel:"+v.replace(/\s+/g,""), labelFn: v=>v },
+  whatsapp:  { icon:"💬", label:"WhatsApp",   placeholder:"+20 100 000 0000",                 prefix:["https://wa.me/"], hrefFn: v=>"https://wa.me/"+v.replace(/[+\s]/g,""), labelFn:v=>v },
+  telegram:  { icon:"✈️", label:"Telegram",   placeholder:"https://t.me/username",            prefix:["https://t.me/"], hrefFn:v=>v, labelFn:v=>stripUrl(v,"https://t.me/") },
+};
+
+function stripUrl(url, ...prefixes){
+  let r = url;
+  prefixes.forEach(p=>{ if(r.startsWith(p)) r = r.slice(p.length); });
+  return r || url;
+}
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let dirHandle    = null;
+let parsedDoc    = null;
+let avatarFile   = null;
+let isFallback   = false;
+let platforms    = []; // [{key, value}]
+let projects     = [];
+
+/* ══════════════════════════════════════════
+   ELEMENT REFS
+══════════════════════════════════════════ */
+const btnConnect        = document.getElementById("btn-connect");
+const connStatus        = document.getElementById("connection-status");
+const dirPathInfo       = document.getElementById("dir-path-info");
+const formContainer     = document.getElementById("form-container");
+const inputName         = document.getElementById("input-name");
+const inputAvatar       = document.getElementById("input-avatar");
+const imgAvatarPreview  = document.getElementById("img-avatar-preview");
+const txtAvatarFile     = document.getElementById("txt-avatar-file");
+const platformsList     = document.getElementById("platforms-list");
+const emptyMsg          = document.getElementById("empty-msg");
+const platformPicker    = document.getElementById("platform-picker");
+const btnAddPlatform    = document.getElementById("btn-add-platform");
+const projectsList      = document.getElementById("projects-list");
+const btnAddProject     = document.getElementById("btn-add-project");
+const btnCompile        = document.getElementById("btn-compile");
+const toast             = document.getElementById("notification-toast");
+const fallbackBox       = document.getElementById("fallback-instructions");
+const txtCompileInfo    = document.getElementById("txt-compile-info");
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+window.addEventListener("DOMContentLoaded", ()=>{
+  if(!window.showDirectoryPicker || window.location.protocol==="file:"){
+    isFallback = true;
+    connStatus.textContent = "Fallback Mode Active";
+    connStatus.className   = "status-badge fallback";
+    btnConnect.textContent = "Load index.html File";
+    txtCompileInfo.textContent = "Downloads will generate on compile click.";
+  }
+});
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+function showToast(msg, isError=false){
+  toast.textContent = msg;
+  toast.className = isError ? "notification error show" : "notification show";
+  setTimeout(()=>toast.classList.remove("show"), 4000);
+}
+
+/* ══════════════════════════════════════════
+   CONNECT / LOAD
+══════════════════════════════════════════ */
+btnConnect.addEventListener("click", async()=>{
+  if(isFallback){
+    const fi = document.createElement("input");
+    fi.type="file"; fi.accept=".html";
+    fi.onchange = async e=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      if(file.name !== "index.html"){ showToast("Please select the correct 'index.html' file.",true); return; }
+      try{
+        const text = await file.text();
+        parsePortfolio(text);
+        connStatus.textContent="index.html Loaded"; connStatus.className="status-badge connected";
+        dirPathInfo.textContent="Loaded: "+file.name; dirPathInfo.style.display="block";
+        formContainer.classList.remove("blocked");
+        showToast("Loaded index.html successfully!");
+      }catch(err){ console.error(err); showToast("Failed to read the file.",true); }
+    };
+    fi.click();
+  } else {
+    try{
+      dirHandle = await window.showDirectoryPicker({mode:"readwrite"});
+      const fh   = await dirHandle.getFileHandle("index.html");
+      const file = await fh.getFile();
+      const text = await file.text();
+      parsePortfolio(text);
+      connStatus.textContent="Directory Connected"; connStatus.className="status-badge connected";
+      dirPathInfo.textContent="Connected to: "+dirHandle.name; dirPathInfo.style.display="block";
+      formContainer.classList.remove("blocked");
+      showToast("Connected and loaded index.html successfully!");
+    }catch(err){ console.error(err); showToast("Folder connection rejected or invalid.",true); }
+  }
+});
+
+/* ══════════════════════════════════════════
+   PARSE index.html
+══════════════════════════════════════════ */
+function parsePortfolio(htmlText){
+  const parser = new DOMParser();
+  parsedDoc = parser.parseFromString(htmlText, "text/html");
+
+  // Name
+  const nameEl = parsedDoc.querySelector(".trainee-Name");
+  if(nameEl) inputName.value = nameEl.textContent.trim();
+
+  // Avatar
+  const avatarEl = parsedDoc.querySelector(".avatar-icon");
+  if(avatarEl) imgAvatarPreview.src = avatarEl.getAttribute("src");
+
+  // Platforms — read from existing contact cards
+  platforms = [];
+  const cards = parsedDoc.querySelectorAll(".contact-link-card");
+  cards.forEach(card=>{
+    const labelTxt = card.querySelector(".contact-link-label")?.textContent.trim().toLowerCase() || "";
+    const href     = card.getAttribute("href") || "";
+
+    // Match to known platform key
+    const key = Object.keys(PLATFORM_META).find(k=> labelTxt.includes(PLATFORM_META[k].label.toLowerCase().split(" ")[0].toLowerCase()));
+    if(!key) return;
+
+    const meta = PLATFORM_META[key];
+    let value = href;
+    // strip known prefixes to get clean value
+    if(key==="gmail"||key==="phone"||key==="whatsapp"){
+      meta.prefix.forEach(p=>{ value = value.replace(p,""); });
+      value = value.replace(/%2B/g,"+");
+    }
+    platforms.push({key, value});
+  });
+
+  renderPlatforms();
+
+  // Projects
+  projects = [];
+  parsedDoc.querySelectorAll(".projects-grid .project-card").forEach((card,i)=>{
+    const title = card.querySelector("h3")?.textContent.trim() || "Project Title";
+    const desc  = card.querySelector("p")?.textContent.trim()  || "";
+    const link  = card.querySelector(".project-links a")?.getAttribute("href") || "#contact";
+    const thumbEl  = card.querySelector(".project-thumb img");
+    const thumbSrc  = thumbEl ? thumbEl.getAttribute("src") : "";
+    const thumbName = thumbSrc ? thumbSrc.replace("Matrials/","") : "";
+    projects.push({
+      id:Date.now()+i, title, description:desc, pdfPath:link,
+      pdfFile:null,
+      pdfName: link.startsWith("Matrials/") ? link.replace("Matrials/","") : "",
+      thumbFile:null, thumbName, thumbPath:thumbSrc, thumbSrc
+    });
+  });
+  renderProjects();
+}
+
+/* ══════════════════════════════════════════
+   PLATFORMS RENDER
+══════════════════════════════════════════ */
+function renderPlatforms(){
+  platformsList.innerHTML = "";
+  if(platforms.length === 0){
+    platformsList.appendChild(emptyMsg);
+    emptyMsg.style.display = "block";
+    return;
+  }
+  emptyMsg.style.display = "none";
+
+  platforms.forEach((p, idx)=>{
+    const meta = PLATFORM_META[p.key];
+    if(!meta) return;
+
+    const row = document.createElement("div");
+    row.className = "platform-row";
+    row.dataset.idx = idx;
+    row.innerHTML = `
+      <span class="platform-icon">${meta.icon}</span>
+      <span class="platform-name">${meta.label}</span>
+      <input
+        type="text"
+        class="platform-input"
+        value="${escHtml(p.value)}"
+        placeholder="${meta.placeholder}"
+        data-idx="${idx}"
+      />
+      <button class="platform-remove" data-idx="${idx}" title="Remove ${meta.label}">✕</button>
+    `;
+    platformsList.appendChild(row);
+  });
+
+  // Input change handlers
+  platformsList.querySelectorAll(".platform-input").forEach(inp=>{
+    inp.addEventListener("input", e=>{
+      const i = parseInt(e.target.dataset.idx);
+      platforms[i].value = e.target.value;
+    });
+  });
+
+  // Remove handlers
+  platformsList.querySelectorAll(".platform-remove").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      const i = parseInt(e.target.dataset.idx);
+      platforms.splice(i,1);
+      renderPlatforms();
+    });
+  });
+}
+
+/* Add platform from dropdown */
+btnAddPlatform.addEventListener("click", ()=>{
+  const key = platformPicker.value;
+  if(!key){ showToast("Please select a platform first.",true); return; }
+
+  // Avoid duplicates
+  if(platforms.find(p=>p.key===key)){
+    showToast(`${PLATFORM_META[key].label} is already added.`,true);
+    return;
+  }
+
+  platforms.push({key, value:""});
+  platformPicker.value = "";
+  renderPlatforms();
+
+  // Focus the newly added input
+  setTimeout(()=>{
+    const inputs = platformsList.querySelectorAll(".platform-input");
+    if(inputs.length) inputs[inputs.length-1].focus();
+  }, 80);
+});
+
+/* ══════════════════════════════════════════
+   PROJECTS RENDER
+══════════════════════════════════════════ */
+function renderProjects(){
+  projectsList.innerHTML = "";
+  projects.forEach((proj,idx)=>{
+    const item = document.createElement("div");
+    item.className = "project-item";
+    item.innerHTML = `
+      <div class="project-header">
+        <span class="project-num">Project #${idx+1}</span>
+        <button class="btn btn-danger btn-xs" onclick="removeProject(${proj.id})">Delete</button>
+      </div>
+      <div class="project-fields">
+
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>Project Thumbnail Image</label>
+          <div class="upload-widget" style="padding:10px 15px;gap:16px;">
+            <img
+              id="thumb-preview-${proj.id}"
+              src="${proj.thumbSrc || ''}"
+              alt="Thumbnail"
+              style="
+                width:90px;height:60px;object-fit:cover;
+                border-radius:8px;border:1px solid var(--color-border);
+                background:var(--color-card);
+                display:${proj.thumbSrc ? 'block' : 'none'};
+              "
+            />
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div class="file-input-wrapper">
+                <button type="button" class="btn btn-outline btn-sm">Choose Thumbnail</button>
+                <input type="file" accept="image/*" onchange="handleProjectThumb(${proj.id},this)"/>
+              </div>
+              <span class="file-info" id="thumb-label-${proj.id}">
+                ${proj.thumbFile ? 'Selected: '+proj.thumbFile.name : (proj.thumbName ? 'Current: '+proj.thumbName : 'No image selected — shows default label')}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>Project Name</label>
+          <input type="text" value="${escHtml(proj.title)}"
+            oninput="updateProj(${proj.id},'title',this.value)"
+            placeholder="E.g., Competitor Analysis Report"/>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>Brief Description</label>
+          <textarea oninput="updateProj(${proj.id},'description',this.value)"
+            placeholder="Enter a clean description of the project deliverables.">${escHtml(proj.description)}</textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Project File (PDF)</label>
+          <div class="upload-widget" style="padding:10px 15px;">
+            <div class="file-input-wrapper">
+              <button type="button" class="btn btn-outline btn-sm">Choose PDF</button>
+              <input type="file" accept=".pdf" onchange="handleProjectPdf(${proj.id},this)"/>
+            </div>
+            <span class="file-info" id="pdf-label-${proj.id}">
+              ${proj.pdfFile ? "Selected: "+proj.pdfFile.name : (proj.pdfName ? "Current: "+proj.pdfName : "No PDF selected")}
+            </span>
+          </div>
+        </div>
+
+      </div>
+    `;
+    projectsList.appendChild(item);
+  });
+}
+
+window.updateProj = (id,field,val)=>{ const p=projects.find(x=>x.id===id); if(p) p[field]=val; };
+
+window.handleProjectThumb = (id, input)=>{
+  const file = input.files[0]; if(!file) return;
+  const p = projects.find(x=>x.id===id);
+  if(p){
+    p.thumbFile = file;
+    p.thumbName = file.name;
+    p.thumbPath = `Matrials/${file.name}`;
+    const reader = new FileReader();
+    reader.onload = e=>{
+      p.thumbSrc = e.target.result;
+      const preview = document.getElementById(`thumb-preview-${id}`);
+      if(preview){ preview.src = e.target.result; preview.style.display = 'block'; }
+    };
+    reader.readAsDataURL(file);
+    const lbl = document.getElementById(`thumb-label-${id}`);
+    if(lbl) lbl.textContent = 'Selected: ' + file.name;
+  }
+};
+
+window.handleProjectPdf = (id,input)=>{
+  const file=input.files[0]; if(!file) return;
+  const p=projects.find(x=>x.id===id);
+  if(p){ p.pdfFile=file; p.pdfName=file.name; p.pdfPath=`Matrials/${file.name}`; }
+  const lbl=document.getElementById(`pdf-label-${id}`);
+  if(lbl) lbl.textContent="New PDF: "+file.name;
+};
+
+window.removeProject=(id)=>{ projects=projects.filter(x=>x.id!==id); renderProjects(); };
+
+btnAddProject.addEventListener("click",()=>{
+  projects.push({
+    id:Date.now(), title:"New Project Title", description:"New project description.",
+    pdfPath:"#contact", pdfFile:null, pdfName:"",
+    thumbFile:null, thumbName:"", thumbPath:"", thumbSrc:""
+  });
+  renderProjects();
+});
+
+/* Avatar preview */
+inputAvatar.addEventListener("change",e=>{
+  const file=e.target.files[0]; if(!file) return;
+  avatarFile=file;
+  txtAvatarFile.textContent=`New file: ${file.name}`;
+  const reader=new FileReader();
+  reader.onload=ev=>{ imgAvatarPreview.src=ev.target.result; };
+  reader.readAsDataURL(file);
+});
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+function escHtml(str){ return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function downloadFile(content,fileName,type){ const a=document.createElement("a"),f=new Blob([content],{type}); a.href=URL.createObjectURL(f); a.download=fileName; a.click(); URL.revokeObjectURL(a.href); }
+function downloadBlob(blob,fileName){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=fileName; a.click(); URL.revokeObjectURL(a.href); }
+
+/* ══════════════════════════════════════════
+   COMPILE
+══════════════════════════════════════════ */
+btnCompile.addEventListener("click", async()=>{
+  if(!parsedDoc){ showToast("Please load index.html first.",true); return; }
+  btnCompile.disabled=true; btnCompile.textContent="Compiling...";
+
+  try{
+    // 1. Name
+    const newName = inputName.value.trim();
+    const nameEl  = parsedDoc.querySelector(".trainee-Name");
+    if(nameEl) nameEl.textContent = newName;
+    const h1El = parsedDoc.querySelector("h1");
+    if(h1El) h1El.textContent = newName;
+
+    // 2. Avatar
+    if(avatarFile){
+      const avEl = parsedDoc.querySelector(".avatar-icon");
+      if(avEl) avEl.setAttribute("src",`Matrials/${avatarFile.name}`);
+    }
+
+    // 3. Rebuild contact section from platforms array
+    const contactWrap = parsedDoc.querySelector(".contact-links");
+    if(contactWrap){
+      contactWrap.innerHTML = "";
+      platforms.forEach(p=>{
+        const meta = PLATFORM_META[p.key];
+        if(!meta || !p.value.trim()) return;
+
+        const href    = meta.hrefFn(p.value.trim());
+        const display = meta.labelFn(p.value.trim());
+
+        const a = parsedDoc.createElement("a");
+        a.className = "contact-link-card";
+        a.setAttribute("href", href);
+        a.setAttribute("target", "_blank");
+        a.setAttribute("rel", "noopener noreferrer");
+        if(p.key==="gmail"||p.key==="phone") a.removeAttribute("target");
+        a.innerHTML = `
+          <span class="contact-link-label">${meta.label}</span>
+          <span class="contact-link-value">${display}</span>
+        `;
+        contactWrap.appendChild(a);
+      });
+    }
+
+    // 4. Projects
+    const grid = parsedDoc.querySelector(".projects-grid");
+    if(grid){
+      grid.innerHTML="";
+      projects.forEach((proj,idx)=>{
+        const card = parsedDoc.createElement("article");
+        card.className="project-card";
+        const thumbHtml = proj.thumbPath
+          ? `<div class="project-thumb" style="padding:0;overflow:hidden;">
+               <img src="${proj.thumbPath}" alt="${proj.title}" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+             </div>`
+          : `<div class="project-thumb">Project ${String(idx+1).padStart(2,"0")}</div>`;
+        card.innerHTML=`
+          ${thumbHtml}
+          <h3>${proj.title}</h3>
+          <p>${proj.description}</p>
+          <div class="project-links">
+            <a href="${proj.pdfPath}" target="_blank">View Project (PDF)</a>
+            <a href="#contact">Inquire</a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    const finalHtml = "<!DOCTYPE html>\n" + parsedDoc.documentElement.outerHTML;
+
+    if(isFallback){
+      downloadFile(finalHtml,"index.html","text/html");
+      if(avatarFile) downloadBlob(avatarFile, avatarFile.name);
+      projects.forEach(p=>{
+        if(p.pdfFile)   downloadBlob(p.pdfFile,   p.pdfFile.name);
+        if(p.thumbFile) downloadBlob(p.thumbFile, p.thumbFile.name);
+      });
+      fallbackBox.style.display="block";
+      showToast("Compilation successful! Check your downloads.");
+    } else {
+      const matsDir = await dirHandle.getDirectoryHandle("Matrials");
+      if(avatarFile){
+        const fh=await matsDir.getFileHandle(avatarFile.name,{create:true});
+        const w=await fh.createWritable(); await w.write(avatarFile); await w.close();
+      }
+      for(const p of projects){
+        if(p.pdfFile){
+          const fh=await matsDir.getFileHandle(p.pdfFile.name,{create:true});
+          const w=await fh.createWritable(); await w.write(p.pdfFile); await w.close();
+        }
+        if(p.thumbFile){
+          const fh=await matsDir.getFileHandle(p.thumbFile.name,{create:true});
+          const w=await fh.createWritable(); await w.write(p.thumbFile); await w.close();
+        }
+      }
+      const idxFh=await dirHandle.getFileHandle("index.html");
+      const w=await idxFh.createWritable(); await w.write(finalHtml); await w.close();
+      fallbackBox.style.display="none";
+      showToast("Portfolio compiled and saved to disk successfully!");
+    }
+  }catch(err){ console.error(err); showToast("Failed to compile or save changes.",true); }
+  finally{ btnCompile.disabled=false; btnCompile.textContent="Compile & Save Portfolio"; }
+});
+</script>
+</body>
+</html>
