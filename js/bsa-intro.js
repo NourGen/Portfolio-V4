@@ -2,7 +2,6 @@
    BSA Academy — Folder Intro Animation  v7 (Clean Intro Only)
    ============================================================ */
 (function () {
-  if (sessionStorage.getItem("bsa-intro-seen")) return;
 
   // Load fonts
   const fl = document.createElement("link");
@@ -302,7 +301,6 @@
     done = true;
     ov.remove();
     document.body.classList.remove("bsa-active");
-    sessionStorage.setItem("bsa-intro-seen", "1");
   }
 
   function addDelta(d) {
